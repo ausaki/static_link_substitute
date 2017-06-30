@@ -1,6 +1,6 @@
 {
   "name": "static_link_substitute",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "为index.html中的js和css链接加上timestamp参数",
   "main": "index.js",
   "scripts": {
