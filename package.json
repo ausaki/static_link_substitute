@@ -8,8 +8,12 @@
   },
   "dependencies": {
     "webpack-merge": "^0.8.0",
-    "hasha": "^3.3.0"
+    "hasha": "^3.0.0"
   },
   "author": "lujiamin",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "https",
+    "url": "https://github.com/L-xm/staticLinkSubstitute"
+  }
 }
