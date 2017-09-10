@@ -12,15 +12,20 @@ function StaticLinkSubstitute(options) {
   this.options = merge(options, {})
 }
 StaticLinkSubstitute.prototype.process_url = function (url_string, param_type='timestamp') {
-  var public_path = this.options.output.publicPath
-  var root_path = this.options.output.path
+  var public_path = this.options.public_path
+  var root_path = this.options.static_path
   var url_obj = URL.parse(url_string)
   var param = ""
+  var filepath = path.join(root_path, url_obj.pathname)
+  console.log(filepath)
+  if(!fs.existsSync(filepath)){
+    console.log('file not exists')
+    return url_string
+  }
+  if(url_string.startsWith(public_path)){
+    return url_string
+  }
   if(param_type === 'hash'){
-    var filepath = path.join(root_path, url_obj.pathname)
-    if(!fs.existsSync(filepath)){
-        return url_string
-    }
     var filehash = hasha.fromFileSync(filepath, {algorithm: 'md5', encoding: 'hex'})
     param = "hash=" + filehash
   } else if(param_type === 'timestamp'){
@@ -37,8 +42,18 @@ StaticLinkSubstitute.prototype.process_url = function (url_string, param_type='t
 }
 
 StaticLinkSubstitute.prototype.apply = function(compiler) {
-  var thiz = this
-  this.options = merge(compiler.options, this.options)
+  let thiz = this
+  let output = compiler.options.output
+  if(!this.options.public_path){
+    this.options.public_path = output.publicPath
+  }
+  if(!this.options.static_path){
+    if(output.static_path){
+      this.options.static_path = output.static_path
+    } else {
+      this.options.static_path = output.path
+    }
+  }
   compiler.plugin('emit', function(compilation, callback) {
     var html_content = compilation.assets['index.html'].source()
     html_content = html_content.replace(/<link(.*?)href="?(.+?)"?\s+?(.*?)\/?>/g, function(match, p1, p2, p3, offset, string){
