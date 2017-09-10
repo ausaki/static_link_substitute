@@ -11,7 +11,7 @@ const hasha = require('hasha')
 function StaticLinkSubstitute(options) {
   this.options = merge(options, {})
 }
-StaticLinkSubstitute.prototype.process_url = function (url_string, param_type='timestamp') {
+StaticLinkSubstitute.prototype.process_url = function (url_string, param_type) {
   var public_path = this.options.public_path
   var root_path = this.options.static_path
   var url_obj = URL.parse(url_string)
@@ -34,7 +34,7 @@ StaticLinkSubstitute.prototype.process_url = function (url_string, param_type='t
   }
   url_string = public_path + url_obj.pathname + '?'
   if(url_obj.query){
-      url_string += url_obj.query + '&' + param 
+      url_string += url_obj.query + '&' + param
   } else {
       url_string += param
   }
@@ -42,8 +42,8 @@ StaticLinkSubstitute.prototype.process_url = function (url_string, param_type='t
 }
 
 StaticLinkSubstitute.prototype.apply = function(compiler) {
-  let thiz = this
-  let output = compiler.options.output
+  var thiz = this
+  var output = compiler.options.output
   if(!this.options.public_path){
     this.options.public_path = output.publicPath
   }
@@ -57,11 +57,11 @@ StaticLinkSubstitute.prototype.apply = function(compiler) {
   compiler.plugin('emit', function(compilation, callback) {
     var html_content = compilation.assets['index.html'].source()
     html_content = html_content.replace(/<link(.*?)href="?(.+?)"?\s+?(.*?)\/?>/g, function(match, p1, p2, p3, offset, string){
-      p2 = thiz.process_url(p2)
+      p2 = thiz.process_url(p2, 'timestamp')
       return '<link' + p1 + 'href="' + p2 + '" ' + p3 + ' />'
     })
     html_content = html_content.replace(/<script([^<>]*)src="?([^<> "]+)"?([^<>]*)>/g, function(match, p1, p2, p3, offset, string){
-      p2 = thiz.process_url(p2)
+      p2 = thiz.process_url(p2, 'timestamp')
       return '<script' + p1 + 'src="' + p2 + '" ' + p3 + '>'
     })
     compilation.assets['index.html'].source = function () {
